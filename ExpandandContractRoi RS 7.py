@@ -53,7 +53,7 @@ class MyWindow(Window):
         with CompositeAction('Expand (RoiName)'):
             retval_0 = case.PatientModel.CreateRoi(Name=DummyRoi, Color="Yellow", Type="Organ", TissueName=None, RoiMaterial=None)
             retval_0.CreateMarginGeometry(Examination=examination, SourceRoiName=RoiName, MarginSettings={ 'Type': "Expand", 'Superior': margin, 'Inferior': margin, 'Anterior': margin, 'Posterior': margin, 'Right': margin, 'Left': margin })
-        # Shrink the dummyroi by margin and give it its original name
+        # Shrink the dummyroi by margin and give it its new name
         with CompositeAction('Contract (DummyRoi)'):
             retval_1 = case.PatientModel.CreateRoi(Name=NewRoi, Color=roicolor, Type=roitype, TissueName=None, RoiMaterial=roimaterial)
             retval_1 = case.PatientModel.RegionsOfInterest[NewRoi].CreateMarginGeometry(Examination=examination, SourceRoiName=DummyRoi, MarginSettings={ 'Type': "Contract", 'Superior': margin, 'Inferior': margin, 'Anterior': margin, 'Posterior': margin, 'Right': margin, 'Left': margin })
