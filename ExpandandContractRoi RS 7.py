@@ -6,8 +6,20 @@
 #------------------------------------------------------
 
 import wpf
-from System.Windows import MessageBox
-from System.Windows import Application, Window
+from System.Windows import *
+
+def GetPlan():
+    # ###########################################
+    # ##  Code to get handles to plan data   ####
+    # ###########################################
+    global case, plan, exam, examination, ss
+    try:
+        case = get_current( 'Case' )
+        examination = get_current( 'Examination' )
+        ss = case.PatientModel.StructureSets[examination.Name]
+    except:
+        MessageBox.Show( 'A patient and plan must be loaded.', "Expand&ContractRoi", MessageBoxButton.OK, MessageBoxImage.Information)
+        sys.exit()
 
 
 def UniqueRoi(name, ss):
@@ -28,13 +40,12 @@ class MyWindow(Window):
 
 
     def ComputeClicked(self, sender, event):
-        #roi_list = [roi.OfRoi.Name for roi in ss.RoiGeometries]
         # Get the ROI from the combobox.
         RoiName = self.SelectROI.SelectedItem
 
         if RoiName == "" or RoiName == None:
             # No ROI selected
-            MessageBox.Show('First choose a ROI.') 
+            MessageBox.Show('First choose an ROI.',"Expand&ContractRoi", MessageBoxButton.OK, MessageBoxImage.Information) 
             return
 
         margin = self.slValue.Value
@@ -60,7 +71,7 @@ class MyWindow(Window):
 
         # Remove the dummy roi
         case.PatientModel.RegionsOfInterest[DummyRoi].DeleteRoi()
-        MessageBox.Show('Finished.' + "\r\n" + "Rounded Roi is called: "  + NewRoi)
+        MessageBox.Show('Finished.' + "\r\n" + "Rounded Roi is called: "  + NewRoi,"Expand&ContractRoi", MessageBoxButton.OK, MessageBoxImage.Information) 
         self.SelectROI.SelectedIndex = -1
 
     def CloseClicked(self, sender, event): 
@@ -69,19 +80,7 @@ class MyWindow(Window):
 
 # Run in RayStation.
 from connect import * 
-
-try:
-    examination = get_current('Examination')
-    examname = examination.Name
-    case = get_current('Case')
-except:
-    examination = get_current('Examination')
-    examname = examination.Name
-    case = get_current('Case')
-
-
-
-ss = case.PatientModel.StructureSets[examination.Name]
+GetPlan()
 
 if __name__ == '__main__':
     Application().Run(MyWindow())
