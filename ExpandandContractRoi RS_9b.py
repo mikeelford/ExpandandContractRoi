@@ -41,7 +41,7 @@ def GetPlan():
 def UniqueRoi(name, fss):
     for p in fss.RoiGeometries:
         if name == p.OfRoi.Name:
-            name = name + '_1'
+            name = f'{name}_1'
             name = UniqueRoi(name, fss)
     return name
 
@@ -60,7 +60,7 @@ class MyWindow(Window):
         # Get the ROI from the combobox.
         RoiName = self.SelectROI.SelectedItem
 
-        if RoiName == "" or RoiName == 'None':
+        if RoiName in ["", 'None']:
             # No ROI selected
             MessageBox.Show('First choose an ROI.', "Expand&ContractRoi", MessageBoxButton.OK,
                             MessageBoxImage.Information)
@@ -131,53 +131,51 @@ class MyWindow(Window):
 
     def ExtraClicked(self, sender, event):
         roi_name = str(self.SelectROI.SelectedItem)
-        print 'roi_name: ', roi_name
-        if roi_name == "" or roi_name == 'None':
+        roi_name = str(self.SelectROI.SelectedItem)
+        if roi_name in {"", 'None'}:
             # geen roi geselecteerd
             MessageBox.Show('First choose an ROI.', "Expand&ContractRoi", MessageBoxButton.OK,
                             MessageBoxImage.Information)
             return
         roi = ss.RoiGeometries[roi_name]
         if hasattr(roi.PrimaryShape, 'Contours'):
-            msg = "'" + roi_name + "' is in contourvorm..."
+            msg = f"'{roi_name}' is in contourvorm..."
             print(msg)
 
             # controleer nu of de contour sagitaal is
             contours = roi.PrimaryShape.Contours
             if abs(contours[0][0].z - contours[0][1].z) > 1e-5:
-                msg = 'Dit contour: ' + roi_name + ' is niet in transversale richting, converteren naar transversaal... '
+                msg = f'Dit contour: {roi_name} is niet in transversale richting, converteren naar transversaal... '
                 print(msg)
                 roi.SetRepresentation(Representation='Triangle Mesh')
                 roi.SetRepresentation(Representation='Contours')
             else:
                 print("Deze contour is in transversale richting!")
         else:
-            msg = "'" + roi_name + "' is niet in contourvorm... Converteren naar contouren"
+            msg = f"'{roi_name}' is niet in contourvorm... Converteren naar contouren"
             print(msg)
             roi.SetRepresentation(Representation='Contours')
 
         # Voert nu verwijdering uit
         oude_contouren = roi.PrimaryShape.Contours  # moet de contouren opnieuw inlezen (trans)
         lengte = len(oude_contouren)
-        print('Aantal coupes =' + str(lengte))
+        print(f'Aantal coupes ={lengte}')
         if lengte <= 2:
-            MessageBox.Show("'" + roi_name + "' aantal coupes =" + str(lengte) + ": geen verwijdering nodig!")
+            MessageBox.Show(
+                f"'{roi_name}' aantal coupes ={lengte}: geen verwijdering nodig!"
+            )
 
         verwijder = int(self.slValue2.Value)  # haal het nummer uit het juiste slider
-        print("Houd een contour voor elke " + str(verwijder) + " coupes!")
+        print(f"Houd een contour voor elke {verwijder} coupes!")
 
         mijn_coupes = []
         for j, slice in zip(range(lengte - 1), oude_contouren):
             if j % verwijder == 0:
-                nieuwe_coupe = []
-                for p in slice:  # p is elk punt in dat segment
-                    nieuwe_coupe.append({'x': p.x, 'y': p.y, 'z': p.z})
+                nieuwe_coupe = [{'x': p.x, 'y': p.y, 'z': p.z} for p in slice]
                 mijn_coupes.append(nieuwe_coupe)
         # Laatste plak toevoegen
         laatste_coupe = oude_contouren[lengte - 1]
-        nieuwe_coupe = []
-        for p in laatste_coupe:
-            nieuwe_coupe.append({'x': p.x, 'y': p.y, 'z': p.z})
+        nieuwe_coupe = [{'x': p.x, 'y': p.y, 'z': p.z} for p in laatste_coupe]
         mijn_coupes.append(nieuwe_coupe)
 
         ss.RoiGeometries[roi_name].PrimaryShape.Contours = mijn_coupes
