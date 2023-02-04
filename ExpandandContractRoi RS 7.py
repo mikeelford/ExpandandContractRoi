@@ -25,7 +25,7 @@ def GetPlan():
 def UniqueRoi(name, ss):
     for p in ss.RoiGeometries:
         if name == p.OfRoi.Name:
-            name = name + '_1'
+            name = f'{name}_1'
             name = UniqueRoi(name, ss)
     return name
 
@@ -43,7 +43,7 @@ class MyWindow(Window):
         # Get the ROI from the combobox.
         RoiName = self.SelectROI.SelectedItem
 
-        if RoiName == "" or RoiName == None:
+        if RoiName == "" or RoiName is None:
             # No ROI selected
             MessageBox.Show('First choose an ROI.',"Expand&ContractRoi", MessageBoxButton.OK, MessageBoxImage.Information) 
             return
@@ -71,7 +71,7 @@ class MyWindow(Window):
 
         # Remove the dummy roi
         case.PatientModel.RegionsOfInterest[DummyRoi].DeleteRoi()
-        MessageBox.Show('Finished.' + "\r\n" + "Rounded Roi is called: "  + NewRoi,"Expand&ContractRoi", MessageBoxButton.OK, MessageBoxImage.Information) 
+        MessageBox.Show('Finished.' + "\r\n" + "Rounded Roi is called: "  + NewRoi,"Expand&ContractRoi", MessageBoxButton.OK, MessageBoxImage.Information)
         self.SelectROI.SelectedIndex = -1
 
     def CloseClicked(self, sender, event): 
